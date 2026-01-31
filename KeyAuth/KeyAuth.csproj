@@ -6,7 +6,9 @@
 	<LangVersion>latest</LangVersion>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	<Title>KeyAuth</Title>
+	<Title>KeyAuth-Api</Title>
+	<PackageId>KeyAuth-Api</PackageId>
+	<RepositoryUrl>https://github.com/Rikitav/KeyAuth</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
