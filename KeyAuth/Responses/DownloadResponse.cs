@@ -1,30 +1,32 @@
 using KeyAuth.Utilities;
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a file download request
+/// </summary>
+public class DownloadResponse : ResponseBase
 {
+    [JsonPropertyName("contents")]
+    private string? _contents;
+
     /// <summary>
-    /// Response to file download request
+    /// The contents of the downloaded file
     /// </summary>
-    public class DownloadResponse : ResponseBase
+    public byte[]? Contents
     {
-        [JsonPropertyName("contents")]
-        private string? _contents;
-
-        public byte[]? Contents
+        get
         {
-            get
-            {
-                if (string.IsNullOrEmpty(_contents))
-                    return null;
+            if (string.IsNullOrEmpty(_contents))
+                return null;
 
-                return EncryptionHelper.ToByteArray(_contents);
-            }
+            return EncryptionHelper.ToByteArray(_contents);
+        }
 
-            set
-            {
-                _contents = EncryptionHelper.ToString(value!);
-            }
+        set
+        {
+            _contents = EncryptionHelper.ToString(value!);
         }
     }
 }

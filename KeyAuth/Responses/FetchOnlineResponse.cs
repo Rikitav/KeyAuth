@@ -1,15 +1,17 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a fetch online users request
+/// </summary>
+public class FetchOnlineResponse : ResponseBase
 {
     /// <summary>
-    /// Response to fetch online users request
+    /// A list of online users
     /// </summary>
-    public class FetchOnlineResponse : ResponseBase
-    {
-        [JsonPropertyName("users")]
-        public List<User>? Users { get; set; }
-    }
+    [JsonPropertyName("users")]
+    public List<User>? Users { get; set; }
 }
 

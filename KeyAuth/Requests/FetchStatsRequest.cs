@@ -1,11 +1,15 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to fetch application statistics
+/// </summary>
+public class FetchStatsRequest : RequestBase<FetchStatsResponse>
 {
     /// <summary>
-    /// Запрос получения статистики приложения
+    /// The type of the request
     /// </summary>
-    public class FetchStatsRequest : RequestBase<Responses.FetchStatsResponse>
-    {
-        public override string Type => "fetchStats";
-    }
+    public override string Type => "fetchStats";
 }
 

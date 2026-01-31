@@ -1,14 +1,21 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to get a global variable
+/// </summary>
+public class VarRequest : RequestBase<VarResponse>
 {
     /// <summary>
-    /// Запрос получения глобальной переменной
+    /// The type of the request
     /// </summary>
-    public class VarRequest : RequestBase<Responses.VarResponse>
-    {
-        public override string Type => "var";
+    public override string Type => "var";
 
-        [ApiParameter("varid")]
-        public string? VarId { get; set; }
-    }
+    /// <summary>
+    /// The ID of the variable
+    /// </summary>
+    [ApiParameter("varid")]
+    public string? VarId { get; set; }
 }
 

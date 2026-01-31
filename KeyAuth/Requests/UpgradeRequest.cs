@@ -1,17 +1,27 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to upgrade a user's subscription
+/// </summary>
+public class UpgradeRequest : RequestBase<UpgradeResponse>
 {
     /// <summary>
-    /// Запрос обновления подписки
+    /// The type of the request
     /// </summary>
-    public class UpgradeRequest : RequestBase<Responses.UpgradeResponse>
-    {
-        public override string Type => "upgrade";
+    public override string Type => "upgrade";
 
-        [ApiParameter("username")]
-        public string? Username { get; set; }
+    /// <summary>
+    /// The username to upgrade
+    /// </summary>
+    [ApiParameter("username")]
+    public string? Username { get; set; }
 
-        [ApiParameter("key")]
-        public string? Key { get; set; }
-    }
+    /// <summary>
+    /// The license key to use for the upgrade
+    /// </summary>
+    [ApiParameter("key")]
+    public string? Key { get; set; }
 }
 

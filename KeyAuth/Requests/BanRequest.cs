@@ -1,14 +1,21 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to ban a user
+/// </summary>
+public class BanRequest : RequestBase<BanResponse>
 {
     /// <summary>
-    /// Запрос бана пользователя
+    /// The type of the request
     /// </summary>
-    public class BanRequest : RequestBase<Responses.BanResponse>
-    {
-        public override string Type => "ban";
+    public override string Type => "ban";
 
-        [ApiParameter("reason")]
-        public string? Reason { get; set; }
-    }
+    /// <summary>
+    /// The reason for the ban
+    /// </summary>
+    [ApiParameter("reason")]
+    public string? Reason { get; set; }
 }
 

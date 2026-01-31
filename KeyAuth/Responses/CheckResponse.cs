@@ -1,14 +1,16 @@
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a check session request
+/// </summary>
+public class CheckResponse : ResponseBase
 {
     /// <summary>
-    /// Ответ на запрос проверки сессии
+    /// The owner ID of the application
     /// </summary>
-    public class CheckResponse : ResponseBase
-    {
-        [JsonPropertyName("ownerid")]
-        public string? OwnerId { get; set; }
-    }
+    [JsonPropertyName("ownerid")]
+    public string? OwnerId { get; set; }
 }
 

@@ -1,17 +1,27 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to recover a password
+/// </summary>
+public class ForgotRequest : RequestBase<ForgotResponse>
 {
     /// <summary>
-    /// Запрос восстановления пароля
+    /// The type of the request
     /// </summary>
-    public class ForgotRequest : RequestBase<Responses.ForgotResponse>
-    {
-        public override string Type => "forgot";
+    public override string Type => "forgot";
 
-        [ApiParameter("username")]
-        public string? Username { get; set; }
+    /// <summary>
+    /// The username
+    /// </summary>
+    [ApiParameter("username")]
+    public string? Username { get; set; }
 
-        [ApiParameter("email")]
-        public string? Email { get; set; }
-    }
+    /// <summary>
+    /// The email address
+    /// </summary>
+    [ApiParameter("email")]
+    public string? Email { get; set; }
 }
 

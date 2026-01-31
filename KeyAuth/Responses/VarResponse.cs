@@ -1,19 +1,21 @@
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a global variable request
+/// </summary>
+public class VarResponse : ResponseBase
 {
     /// <summary>
-    /// Response to global variable request
+    /// The owner ID of the application
     /// </summary>
-    public class VarResponse : ResponseBase
-    {
-        [JsonPropertyName("ownerid")]
-        public string? OwnerId { get; set; }
+    [JsonPropertyName("ownerid")]
+    public string? OwnerId { get; set; }
 
-        /// <summary>
-        /// Variable value (stored in the message field of the response)
-        /// </summary>
-        public string? Value => Message;
-    }
+    /// <summary>
+    /// The value of the variable
+    /// </summary>
+    public string? Value => Message;
 }
 

@@ -1,14 +1,16 @@
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to an upgrade request
+/// </summary>
+public class UpgradeResponse : ResponseBase
 {
     /// <summary>
-    /// Ответ на запрос обновления подписки
+    /// The owner ID of the application
     /// </summary>
-    public class UpgradeResponse : ResponseBase
-    {
-        [JsonPropertyName("ownerid")]
-        public string? OwnerId { get; set; }
-    }
+    [JsonPropertyName("ownerid")]
+    public string? OwnerId { get; set; }
 }
 

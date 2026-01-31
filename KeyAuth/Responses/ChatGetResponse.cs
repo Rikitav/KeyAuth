@@ -1,15 +1,17 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a chat get request
+/// </summary>
+public class ChatGetResponse : ResponseBase
 {
     /// <summary>
-    /// Response to chat messages request
+    /// A list of chat messages
     /// </summary>
-    public class ChatGetResponse : ResponseBase
-    {
-        [JsonPropertyName("messages")]
-        public List<MessageEntity>? Messages { get; set; }
-    }
+    [JsonPropertyName("messages")]
+    public List<MessageEntity>? Messages { get; set; }
 }
 

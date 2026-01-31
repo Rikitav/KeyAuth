@@ -1,14 +1,21 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to get chat messages
+/// </summary>
+public class ChatGetRequest : RequestBase<ChatGetResponse>
 {
     /// <summary>
-    /// Запрос получения сообщений из чата
+    /// The type of the request
     /// </summary>
-    public class ChatGetRequest : RequestBase<Responses.ChatGetResponse>
-    {
-        public override string Type => "chatget";
+    public override string Type => "chatget";
 
-        [ApiParameter("channel")]
-        public string? ChannelName { get; set; }
-    }
+    /// <summary>
+    /// The name of the channel
+    /// </summary>
+    [ApiParameter("channel")]
+    public string? ChannelName { get; set; }
 }
 

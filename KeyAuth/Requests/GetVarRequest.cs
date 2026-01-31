@@ -1,14 +1,21 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to get a user variable
+/// </summary>
+public class GetVarRequest : RequestBase<GetVarResponse>
 {
     /// <summary>
-    /// Запрос получения переменной пользователя
+    /// The type of the request
     /// </summary>
-    public class GetVarRequest : RequestBase<Responses.GetVarResponse>
-    {
-        public override string Type => "getvar";
+    public override string Type => "getvar";
 
-        [ApiParameter("var")]
-        public string? VarName { get; set; }
-    }
+    /// <summary>
+    /// The name of the variable
+    /// </summary>
+    [ApiParameter("var")]
+    public string? VarName { get; set; }
 }
 

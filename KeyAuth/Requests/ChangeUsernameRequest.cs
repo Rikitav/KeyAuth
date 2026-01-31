@@ -1,14 +1,21 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to change a username
+/// </summary>
+public class ChangeUsernameRequest : RequestBase<ChangeUsernameResponse>
 {
     /// <summary>
-    /// Запрос изменения имени пользователя
+    /// The type of the request
     /// </summary>
-    public class ChangeUsernameRequest : RequestBase<Responses.ChangeUsernameResponse>
-    {
-        public override string Type => "changeUsername";
+    public override string Type => "changeUsername";
 
-        [ApiParameter("newUsername")]
-        public string? NewUsername { get; set; }
-    }
+    /// <summary>
+    /// The new username
+    /// </summary>
+    [ApiParameter("newUsername")]
+    public string? NewUsername { get; set; }
 }
 

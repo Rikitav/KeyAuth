@@ -1,14 +1,21 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to enable two-factor authentication
+/// </summary>
+public class Enable2FaRequest : RequestBase<Enable2FaResponse>
 {
     /// <summary>
-    /// Запрос включения двухфакторной аутентификации
+    /// The type of the request
     /// </summary>
-    public class Enable2FaRequest : RequestBase<Responses.Enable2FaResponse>
-    {
-        public override string Type => "2faenable";
+    public override string Type => "2faenable";
 
-        [ApiParameter("code")]
-        public string? Code { get; set; }
-    }
+    /// <summary>
+    /// The 2FA code
+    /// </summary>
+    [ApiParameter("code")]
+    public string? Code { get; set; }
 }
 

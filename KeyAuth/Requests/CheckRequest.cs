@@ -1,11 +1,15 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to check the current session
+/// </summary>
+public class CheckRequest : RequestBase<CheckResponse>
 {
     /// <summary>
-    /// Запрос проверки сессии
+    /// The type of the request
     /// </summary>
-    public class CheckRequest : RequestBase<Responses.CheckResponse>
-    {
-        public override string Type => "check";
-    }
+    public override string Type => "check";
 }
 

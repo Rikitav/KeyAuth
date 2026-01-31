@@ -1,14 +1,21 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to download a file
+/// </summary>
+public class DownloadRequest : RequestBase<DownloadResponse>
 {
     /// <summary>
-    /// Запрос загрузки файла
+    /// The type of the request
     /// </summary>
-    public class DownloadRequest : RequestBase<Responses.DownloadResponse>
-    {
-        public override string Type => "file";
+    public override string Type => "file";
 
-        [ApiParameter("fileid")]
-        public string? FileId { get; set; }
-    }
+    /// <summary>
+    /// The ID of the file to download
+    /// </summary>
+    [ApiParameter("fileid")]
+    public string? FileId { get; set; }
 }
 

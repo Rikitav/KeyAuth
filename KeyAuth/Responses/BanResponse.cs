@@ -1,14 +1,16 @@
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a ban request
+/// </summary>
+public class BanResponse : ResponseBase
 {
     /// <summary>
-    /// Ответ на запрос бана пользователя
+    /// The owner ID of the application
     /// </summary>
-    public class BanResponse : ResponseBase
-    {
-        [JsonPropertyName("ownerid")]
-        public string? OwnerId { get; set; }
-    }
+    [JsonPropertyName("ownerid")]
+    public string? OwnerId { get; set; }
 }
 

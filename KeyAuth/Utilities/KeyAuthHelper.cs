@@ -2,74 +2,73 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace KeyAuth.Utilities
+namespace KeyAuth.Utilities;
+
+/// <summary>
+/// Helper methods for KeyAuth
+/// </summary>
+internal static class KeyAuthHelper
 {
     /// <summary>
-    /// Helper methods for KeyAuth
+    /// Calculates MD5 hash of a file
     /// </summary>
-    public static class KeyAuthHelper
+    public static string Checksum(string filename)
     {
-        /// <summary>
-        /// Calculates MD5 hash of a file
-        /// </summary>
-        public static string Checksum(string filename)
+        string result;
+        using (MD5 md = MD5.Create())
         {
-            string result;
-            using (MD5 md = MD5.Create())
+            using (FileStream fileStream = File.OpenRead(filename))
             {
-                using (FileStream fileStream = File.OpenRead(filename))
-                {
-                    byte[] value = md.ComputeHash(fileStream);
-                    result = BitConverter.ToString(value).Replace("-", "").ToLowerInvariant();
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Calculates SHA256 hash of token from file
-        /// </summary>
-        public static string TokenHash(string tokenPath)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                using (var s = File.OpenRead(tokenPath))
-                {
-                    byte[] bytes = sha256.ComputeHash(s);
-                    return BitConverter.ToString(bytes).Replace("-", string.Empty);
-                }
+                byte[] value = md.ComputeHash(fileStream);
+                result = BitConverter.ToString(value).Replace("-", "").ToLowerInvariant();
             }
         }
+        return result;
+    }
 
-        /// <summary>
-        /// Converts Unix timestamp to DateTime
-        /// </summary>
-        public static DateTime UnixTimeToDateTime(long unixtime)
+    /// <summary>
+    /// Calculates SHA256 hash of token from file
+    /// </summary>
+    public static string TokenHash(string tokenPath)
+    {
+        using (var sha256 = SHA256.Create())
         {
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Local);
-            try
+            using (var s = File.OpenRead(tokenPath))
             {
-                dtDateTime = dtDateTime.AddSeconds(unixtime).ToLocalTime();
+                byte[] bytes = sha256.ComputeHash(s);
+                return BitConverter.ToString(bytes).Replace("-", string.Empty);
             }
-            catch
-            {
-                dtDateTime = DateTime.MaxValue;
-            }
-            return dtDateTime;
         }
+    }
 
-        /// <summary>
-        /// Calculates days remaining until subscription expiry
-        /// </summary>
-        public static string ExpiryDaysLeft(SubscriptionData subscription)
+    /// <summary>
+    /// Converts Unix timestamp to DateTime
+    /// </summary>
+    public static DateTime UnixTimeToDateTime(long unixtime)
+    {
+        System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Local);
+        try
         {
-            if (subscription.Expiry == null)
-                return "0 Days 0 Hours Left";
-
-            DateTime dtDateTime = UnixTimeToDateTime(long.Parse(subscription.Expiry));
-            TimeSpan difference = dtDateTime - DateTime.Now;
-            return Convert.ToString(difference.Days + " Days " + difference.Hours + " Hours Left");
+            dtDateTime = dtDateTime.AddSeconds(unixtime).ToLocalTime();
         }
+        catch
+        {
+            dtDateTime = DateTime.MaxValue;
+        }
+        return dtDateTime;
+    }
+
+    /// <summary>
+    /// Calculates days remaining until subscription expiry
+    /// </summary>
+    public static string ExpiryDaysLeft(SubscriptionData subscription)
+    {
+        if (subscription.Expiry == null)
+            return "0 Days 0 Hours Left";
+
+        DateTime dtDateTime = UnixTimeToDateTime(long.Parse(subscription.Expiry));
+        TimeSpan difference = dtDateTime - DateTime.Now;
+        return Convert.ToString(difference.Days + " Days " + difference.Hours + " Hours Left");
     }
 }
 

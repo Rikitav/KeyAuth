@@ -1,14 +1,16 @@
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a blacklist check request
+/// </summary>
+public class CheckBlackResponse : ResponseBase
 {
     /// <summary>
-    /// Ответ на запрос проверки на черный список
+    /// The owner ID of the application
     /// </summary>
-    public class CheckBlackResponse : ResponseBase
-    {
-        [JsonPropertyName("ownerid")]
-        public string? OwnerId { get; set; }
-    }
+    [JsonPropertyName("ownerid")]
+    public string? OwnerId { get; set; }
 }
 

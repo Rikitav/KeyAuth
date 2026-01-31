@@ -1,14 +1,16 @@
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a logout request
+/// </summary>
+public class LogoutResponse : ResponseBase
 {
     /// <summary>
-    /// Ответ на запрос выхода
+    /// The owner ID of the application
     /// </summary>
-    public class LogoutResponse : ResponseBase
-    {
-        [JsonPropertyName("ownerid")]
-        public string? OwnerId { get; set; }
-    }
+    [JsonPropertyName("ownerid")]
+    public string? OwnerId { get; set; }
 }
 

@@ -1,32 +1,51 @@
+using KeyAuth.Responses;
 using System.Collections.Specialized;
 using System.Security.Principal;
 
-namespace KeyAuth.Requests
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to login with a username and password
+/// </summary>
+public class LoginRequest : RequestBase<LoginResponse>
 {
     /// <summary>
-    /// Login request with username and password
+    /// The type of the request
     /// </summary>
-    public class LoginRequest : RequestBase<Responses.LoginResponse>
+    public override string Type => "login";
+
+    /// <summary>
+    /// The username
+    /// </summary>
+    [ApiParameter("username")]
+    public string? Username { get; set; }
+
+    /// <summary>
+    /// The password
+    /// </summary>
+    [ApiParameter("pass")]
+    public string? Password { get; set; }
+
+    /// <summary>
+    /// The 2FA code
+    /// </summary>
+    [ApiParameter("code")]
+    public string? Code { get; set; }
+
+    /// <summary>
+    /// Gets additional parameters for the request
+    /// </summary>
+    /// <param name="sessionId">The session ID</param>
+    /// <param name="name">The application name</param>
+    /// <param name="ownerId">The owner ID</param>
+    /// <returns>A collection of additional parameters</returns>
+    protected override NameValueCollection GetAdditionalParameters(string? sessionId, string name, string ownerId)
     {
-        public override string Type => "login";
-
-        [ApiParameter("username")]
-        public string? Username { get; set; }
-
-        [ApiParameter("pass")]
-        public string? Password { get; set; }
-
-        [ApiParameter("code")]
-        public string? Code { get; set; }
-
-        protected override NameValueCollection GetAdditionalParameters(string? sessionId, string name, string ownerId)
+        string? hwid = WindowsIdentity.GetCurrent().User?.Value;
+        return new NameValueCollection
         {
-            string? hwid = WindowsIdentity.GetCurrent().User?.Value;
-            return new NameValueCollection
-            {
-                ["hwid"] = hwid ?? string.Empty
-            };
-        }
+            ["hwid"] = hwid ?? string.Empty
+        };
     }
 }
 

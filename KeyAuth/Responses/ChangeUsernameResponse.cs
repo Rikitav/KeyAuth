@@ -1,10 +1,7 @@
-namespace KeyAuth.Responses
-{
-    /// <summary>
-    /// Ответ на запрос изменения имени пользователя
-    /// </summary>
-    public class ChangeUsernameResponse : ResponseBase
-    {
-    }
-}
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a change username request
+/// </summary>
+public class ChangeUsernameResponse : ResponseBase;
 

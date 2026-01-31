@@ -1,10 +1,7 @@
-namespace KeyAuth.Responses
-{
-    /// <summary>
-    /// Ответ на запрос восстановления пароля
-    /// </summary>
-    public class ForgotResponse : ResponseBase
-    {
-    }
-}
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a forgot password request
+/// </summary>
+public class ForgotResponse : ResponseBase;
 

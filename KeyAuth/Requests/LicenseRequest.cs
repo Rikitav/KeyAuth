@@ -1,29 +1,45 @@
+using KeyAuth.Responses;
 using System.Collections.Specialized;
 using System.Security.Principal;
 
-namespace KeyAuth.Requests
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to authenticate with a license key
+/// </summary>
+public class LicenseRequest : RequestBase<LicenseResponse>
 {
     /// <summary>
-    /// License key authentication request
+    /// The type of the request
     /// </summary>
-    public class LicenseRequest : RequestBase<Responses.LicenseResponse>
+    public override string Type => "license";
+
+    /// <summary>
+    /// The license key
+    /// </summary>
+    [ApiParameter("key")]
+    public string? Key { get; set; }
+
+    /// <summary>
+    /// The 2FA code
+    /// </summary>
+    [ApiParameter("code")]
+    public string? Code { get; set; }
+
+    /// <summary>
+    /// Gets additional parameters for the request
+    /// </summary>
+    /// <param name="sessionId">The session ID</param>
+    /// <param name="name">The application name</param>
+    /// <param name="ownerId">The owner ID</param>
+    /// <returns>A collection of additional parameters</returns>
+    protected override NameValueCollection GetAdditionalParameters(string? sessionId, string name, string ownerId)
     {
-        public override string Type => "license";
-
-        [ApiParameter("key")]
-        public string? Key { get; set; }
-
-        [ApiParameter("code")]
-        public string? Code { get; set; }
-
-        protected override NameValueCollection GetAdditionalParameters(string? sessionId, string name, string ownerId)
+        string? hwid = WindowsIdentity.GetCurrent().User?.Value;
+        return new NameValueCollection
         {
-            string? hwid = WindowsIdentity.GetCurrent().User?.Value;
-            return new NameValueCollection
-            {
-                ["hwid"] = hwid ?? string.Empty
-            };
-        }
+            ["hwid"] = hwid ?? string.Empty
+        };
     }
 }
 

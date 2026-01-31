@@ -1,14 +1,21 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to disable two-factor authentication
+/// </summary>
+public class Disable2FaRequest : RequestBase<Disable2FaResponse>
 {
     /// <summary>
-    /// Запрос отключения двухфакторной аутентификации
+    /// The type of the request
     /// </summary>
-    public class Disable2FaRequest : RequestBase<Responses.Disable2FaResponse>
-    {
-        public override string Type => "2fadisable";
+    public override string Type => "2fadisable";
 
-        [ApiParameter("code")]
-        public string? Code { get; set; }
-    }
+    /// <summary>
+    /// The 2FA code
+    /// </summary>
+    [ApiParameter("code")]
+    public string? Code { get; set; }
 }
 

@@ -8,247 +8,252 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace KeyAuth
+namespace KeyAuth;
+
+/// <summary>
+/// KeyAuth API client implementation using HttpClient
+/// </summary>
+public class KeyAuthClient : IKeyAuthClient, IDisposable
 {
+    private readonly HttpClient _httpClient;
+
     /// <summary>
-    /// KeyAuth API client implementation using HttpClient
+    /// Client options
     /// </summary>
-    public class KeyAuthClient : IKeyAuthClient, IDisposable
+    public KeyAuthClientOptions Options { get; }
+
+    /// <summary>
+    /// Current session ID (set after successful initialization)
+    /// </summary>
+    public string? SessionId { get; private set; }
+
+    /// <summary>
+    /// Creates a new instance of the KeyAuth API client
+    /// </summary>
+    /// <param name="options">Client options</param>
+    public KeyAuthClient(KeyAuthClientOptions options)
     {
-        private readonly HttpClient _httpClient;
-        private readonly HttpClientHandler _handler;
+        Options = options ?? throw new ArgumentNullException(nameof(options));
 
-        /// <summary>
-        /// Client options
-        /// </summary>
-        public KeyAuthClientOptions Options { get; }
+        HttpClientHandler handler = new HttpClientHandler();
+        if (Options.Proxy != null)
+            handler.Proxy = Options.Proxy;
 
-        /// <summary>
-        /// Current session ID (set after successful initialization)
-        /// </summary>
-        public string? SessionId { get; private set; }
+        if (Options.ValidateSslCertificate)
+            handler.ServerCertificateCustomValidationCallback = AssertSsl;
 
-        public KeyAuthClient(KeyAuthClientOptions options)
+        _httpClient = new HttpClient(handler);
+        _httpClient.Timeout = Options.Timeout;
+    }
+
+    /// <summary>
+    /// Sends an HTTP request and returns the deserialized response
+    /// </summary>
+    public async Task<TResponse> SendRequest<TResponse>(HttpRequestMessage request, CancellationToken cancellationToken = default) where TResponse : ResponseBase
+    {
+        try
         {
-            Options = options ?? throw new ArgumentNullException(nameof(options));
-
-            _handler = new HttpClientHandler
+            // Check for file manipulation
+            if (Options.EnableFileCheck && FileCheck(Options.FileCheckDomain))
             {
-                Proxy = Options.Proxy
-            };
+                throw new KeyAuthException("File manipulation detected. Terminating process.");
+            }
 
-            _httpClient = new HttpClient(_handler)
+            HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
             {
-                Timeout = Options.Timeout
-            };
-
-            if (Options.ValidateSslCertificate)
-                _handler.ServerCertificateCustomValidationCallback = AssertSsl;
-        }
-
-        /// <summary>
-        /// Sends an HTTP request and returns the deserialized response
-        /// </summary>
-        public async Task<TResponse> SendRequest<TResponse>(HttpRequestMessage request) where TResponse : ResponseBase
-        {
-            try
-            {
-                // Check for file manipulation
-                if (Options.EnableFileCheck && FileCheck(Options.FileCheckDomain))
+                throw response.StatusCode switch
                 {
-                    throw new KeyAuthException("File manipulation detected. Terminating process.");
-                }
-
-                HttpResponseMessage response = await _httpClient.SendAsync(request);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw response.StatusCode switch
-                    {
-                        // Rate Limited
-                        HttpStatusCode.TooManyRequests => new KeyAuthConnectionException("You're connecting too fast to loader, slow down"),
-                        _ => new KeyAuthConnectionException("Connection failure. Please try again, or contact us for help."),
-                    };
-                }
-
-                string rawResponse = await response.Content.ReadAsStringAsync();
-
-                // Handle case when server returns a string instead of JSON
-                if (rawResponse == "KeyAuth_Invalid")
-                {
-                    var invalidResponse = Activator.CreateInstance<TResponse>();
-                    invalidResponse.Success = false;
-                    invalidResponse.Message = "KeyAuth_Invalid";
-                    return invalidResponse;
-                }
-
-                // Signature verification
-                var headers = new WebHeaderCollection();
-                if (response.Headers.TryGetValues("x-signature-ed25519", out IEnumerable<string> signatureValues))
-                    headers["x-signature-ed25519"] = signatureValues.FirstOrDefault();
-
-                if (response.Headers.TryGetValues("x-signature-timestamp", out IEnumerable<string> timeStampValues))
-                    headers["x-signature-timestamp"] = timeStampValues.FirstOrDefault();
-
-                // Get request type from request properties
-                string requestType = "unknown";
-                if (request.Properties.ContainsKey("RequestType"))
-                {
-                    requestType = request.Properties["RequestType"].ToString();
-                }
-
-                SigCheck(rawResponse, headers, requestType);
-
-                // Direct deserialization into TResponse via JSON
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
+                    // Rate Limited
+                    HttpStatusCode.TooManyRequests => new KeyAuthConnectionException("You're connecting too fast to loader, slow down"),
+                    _ => new KeyAuthConnectionException("Connection failure. Please try again, or contact us for help."),
                 };
+            }
 
-                try
-                {
-                    var result = JsonSerializer.Deserialize<TResponse>(rawResponse, options);
-                    return result ?? throw new KeyAuthConnectionException("Failed to deserialize server response. Response was null.");
-                }
-                catch (JsonException jsonEx)
-                {
-                    throw new KeyAuthConnectionException($"Failed to deserialize server response. Invalid JSON format. Response: {rawResponse}", jsonEx);
-                }
-            }
-            catch (KeyAuthException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new KeyAuthConnectionException("Connection failure. Please try again, or contact us for help.", ex);
-            }
-        }
+            string rawResponse = await response.Content.ReadAsStringAsync();
 
-        private static bool FileCheck(string domain)
-        {
+            // Handle case when server returns a string instead of JSON
+            if (rawResponse == "KeyAuth_Invalid")
+            {
+                var invalidResponse = Activator.CreateInstance<TResponse>();
+                invalidResponse.Success = false;
+                invalidResponse.Message = "KeyAuth_Invalid";
+                return invalidResponse;
+            }
+
+            // Signature verification
+            var headers = new WebHeaderCollection();
+            if (response.Headers.TryGetValues("x-signature-ed25519", out IEnumerable<string> signatureValues))
+                headers["x-signature-ed25519"] = signatureValues.FirstOrDefault();
+
+            if (response.Headers.TryGetValues("x-signature-timestamp", out IEnumerable<string> timeStampValues))
+                headers["x-signature-timestamp"] = timeStampValues.FirstOrDefault();
+
+            // Get request type from request properties
+            string requestType = "unknown";
+            if (request.Properties.ContainsKey("RequestType"))
+            {
+                requestType = request.Properties["RequestType"].ToString();
+            }
+
+            SigCheck(rawResponse, headers, requestType);
+
+            // Direct deserialization into TResponse via JSON
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
             try
             {
-                var address = Dns.GetHostAddresses(domain);
-                foreach (var addr in address)
-                {
-                    if (IPAddress.IsLoopback(addr) || IsPrivateIP(addr))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
+                var result = await JsonSerializer.DeserializeAsync<TResponse>(await response.Content.ReadAsStreamAsync(), options, cancellationToken);
+                return result ?? throw new KeyAuthConnectionException("Failed to deserialize server response. Response was null.");
             }
-            catch
+            catch (JsonException jsonEx)
             {
-                return true;
+                throw new KeyAuthConnectionException($"Failed to deserialize server response. Invalid JSON format. Response: {rawResponse}", jsonEx);
             }
         }
-
-        private static bool IsPrivateIP(IPAddress ip)
+        catch (KeyAuthException)
         {
-            byte[] bytes = ip.GetAddressBytes();
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new KeyAuthConnectionException("Connection failure. Please try again, or contact us for help.", ex);
+        }
+    }
 
-            // 10.0.0.0/8
-            if (bytes[0] == 10)
-                return true;
-
-            // 172.16.0.0/12
-            if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] < 32)
-                return true;
-
-            // 192.168.0.0/16
-            if (bytes[0] == 192 && bytes[1] == 168)
-                return true;
+    private static bool FileCheck(string domain)
+    {
+        try
+        {
+            var address = Dns.GetHostAddresses(domain);
+            foreach (var addr in address)
+            {
+                if (IPAddress.IsLoopback(addr) || IsPrivateIP(addr))
+                {
+                    return true;
+                }
+            }
 
             return false;
         }
-
-        private static bool AssertSsl(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        catch
         {
-            if ((!certificate.Issuer.Contains("Google Trust Services") && !certificate.Issuer.Contains("Let's Encrypt")) || sslPolicyErrors != SslPolicyErrors.None)
-            {
-                throw new KeyAuthSslException("SSL assertion fail, make sure you're not debugging Network. Disable internet firewall on router if possible. If not, ask the developer of the program to use custom domains to fix this.");
-            }
-
             return true;
         }
+    }
 
-        private static void SigCheck(string resp, WebHeaderCollection headers, string type)
+    private static bool IsPrivateIP(IPAddress ip)
+    {
+        byte[] bytes = ip.GetAddressBytes();
+
+        // 10.0.0.0/8
+        if (bytes[0] == 10)
+            return true;
+
+        // 172.16.0.0/12
+        if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] < 32)
+            return true;
+
+        // 192.168.0.0/16
+        if (bytes[0] == 192 && bytes[1] == 168)
+            return true;
+
+        return false;
+    }
+
+    private static bool AssertSsl(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+    {
+        if ((!certificate.Issuer.Contains("Google Trust Services") && !certificate.Issuer.Contains("Let's Encrypt")) || sslPolicyErrors != SslPolicyErrors.None)
         {
-            if (type == "log" || type == "file" || type == "2faenable" || type == "2fadisable")
-            {
-                return;
-            }
-
-            try
-            {
-                string signature = headers["x-signature-ed25519"];
-                string timestamp = headers["x-signature-timestamp"];
-
-                if (string.IsNullOrEmpty(signature) || string.IsNullOrEmpty(timestamp))
-                {
-                    throw new KeyAuthSignatureException("Missing signature or timestamp in response headers.");
-                }
-
-                // Try to parse the input string to a long Unix timestamp
-                if (!long.TryParse(timestamp, out long unixTimestamp))
-                {
-                    throw new KeyAuthSignatureException("Failed to parse the timestamp from the server. Please ensure your device's date and time settings are correct.");
-                }
-
-                // Convert the Unix timestamp to a DateTime object (in UTC)
-                DateTime timestampTime = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).UtcDateTime;
-
-                // Get the current UTC time
-                DateTime currentTime = DateTime.UtcNow;
-
-                // Calculate the difference between the current time and the timestamp
-                TimeSpan timeDifference = currentTime - timestampTime;
-
-                // Check if the timestamp is within 20 seconds of the current time
-                if (timeDifference.TotalSeconds > 20)
-                {
-                    throw new KeyAuthSignatureException("Date/Time settings aren't synced on your device, please sync them to use the program");
-                }
-
-                var byteSig = EncryptionHelper.ToByteArray(signature);
-                var byteKey = EncryptionHelper.ToByteArray("5586b4bc69c7a4b487e4563a4cd96afd39140f919bd31cea7d1c6a1e8439422b");
-                string body = timestamp + resp;
-                var byteBody = Encoding.Default.GetBytes(body);
-
-                bool signatureValid = Ed25519.CheckValid(byteSig, byteBody, byteKey);
-                if (!signatureValid)
-                {
-                    throw new KeyAuthSignatureException("Signature checksum failed. Request was tampered with or session ended most likely. Response: " + resp);
-                }
-            }
-            catch (KeyAuthException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new KeyAuthSignatureException("Signature checksum failed. Request was tampered with or session ended most likely. Response: " + resp, ex);
-            }
+            throw new KeyAuthSslException("SSL assertion fail, make sure you're not debugging Network. Disable internet firewall on router if possible. If not, ask the developer of the program to use custom domains to fix this.");
         }
 
-        /// <summary>
-        /// Sets the session ID (internal method for use by extension methods)
-        /// </summary>
-        internal void SetSessionId(string sessionId)
+        return true;
+    }
+
+    private static void SigCheck(string resp, WebHeaderCollection headers, string type)
+    {
+        if (type == "log" || type == "file" || type == "2faenable" || type == "2fadisable")
         {
-            SessionId = sessionId;
+            return;
         }
 
-        public void Dispose()
+        try
         {
-            _httpClient?.Dispose();
-            _handler?.Dispose();
+            string signature = headers["x-signature-ed25519"];
+            string timestamp = headers["x-signature-timestamp"];
+
+            if (string.IsNullOrEmpty(signature) || string.IsNullOrEmpty(timestamp))
+            {
+                throw new KeyAuthSignatureException("Missing signature or timestamp in response headers.");
+            }
+
+            // Try to parse the input string to a long Unix timestamp
+            if (!long.TryParse(timestamp, out long unixTimestamp))
+            {
+                throw new KeyAuthSignatureException("Failed to parse the timestamp from the server. Please ensure your device's date and time settings are correct.");
+            }
+
+            // Convert the Unix timestamp to a DateTime object (in UTC)
+            DateTime timestampTime = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).UtcDateTime;
+
+            // Get the current UTC time
+            DateTime currentTime = DateTime.UtcNow;
+
+            // Calculate the difference between the current time and the timestamp
+            TimeSpan timeDifference = currentTime - timestampTime;
+
+            // Check if the timestamp is within 20 seconds of the current time
+            if (timeDifference.TotalSeconds > 20)
+            {
+                throw new KeyAuthSignatureException("Date/Time settings aren't synced on your device, please sync them to use the program");
+            }
+
+            var byteSig = EncryptionHelper.ToByteArray(signature);
+            var byteKey = EncryptionHelper.ToByteArray("5586b4bc69c7a4b487e4563a4cd96afd39140f919bd31cea7d1c6a1e8439422b");
+            string body = timestamp + resp;
+            var byteBody = Encoding.Default.GetBytes(body);
+
+            bool signatureValid = Ed25519.CheckValid(byteSig, byteBody, byteKey);
+            if (!signatureValid)
+            {
+                throw new KeyAuthSignatureException("Signature checksum failed. Request was tampered with or session ended most likely. Response: " + resp);
+            }
         }
+        catch (KeyAuthException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new KeyAuthSignatureException("Signature checksum failed. Request was tampered with or session ended most likely. Response: " + resp, ex);
+        }
+    }
+
+    /// <summary>
+    /// Sets the session ID (internal method for use by extension methods)
+    /// </summary>
+    public void SetSessionId(string sessionId)
+    {
+        if (SessionId != null)
+            throw new InvalidOperationException("SessionID already assigned");
+
+        SessionId = sessionId;
+    }
+
+    /// <summary>
+    /// Disposes of the HttpClient and HttpClientHandler
+    /// </summary>
+    public void Dispose()
+    {
+        _httpClient?.Dispose();
     }
 }
 

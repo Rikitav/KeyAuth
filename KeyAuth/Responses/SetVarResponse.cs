@@ -1,14 +1,16 @@
 using System.Text.Json.Serialization;
 
-namespace KeyAuth.Responses
+namespace KeyAuth.Responses;
+
+/// <summary>
+/// Represents a response to a set variable request
+/// </summary>
+public class SetVarResponse : ResponseBase
 {
     /// <summary>
-    /// Ответ на запрос установки переменной
+    /// The owner ID of the application
     /// </summary>
-    public class SetVarResponse : ResponseBase
-    {
-        [JsonPropertyName("ownerid")]
-        public string? OwnerId { get; set; }
-    }
+    [JsonPropertyName("ownerid")]
+    public string? OwnerId { get; set; }
 }
 

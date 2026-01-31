@@ -1,11 +1,15 @@
-namespace KeyAuth.Requests
+using KeyAuth.Responses;
+
+namespace KeyAuth.Requests;
+
+/// <summary>
+/// Represents a request to logout
+/// </summary>
+public class LogoutRequest : RequestBase<LogoutResponse>
 {
     /// <summary>
-    /// Запрос выхода из системы
+    /// The type of the request
     /// </summary>
-    public class LogoutRequest : RequestBase<Responses.LogoutResponse>
-    {
-        public override string Type => "logout";
-    }
+    public override string Type => "logout";
 }
 
