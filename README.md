@@ -54,6 +54,11 @@ Thank you for your compliance, we work hard on the development of KeyAuth and do
 
 Below are examples of how to use the `KeyAuthClient` in a standard console application without Dependency Injection.
 
+### Installation
+```bash
+dotnet add package KeyAuth-Api
+```
+
 ### 1. Initialization
 
 You must create a `KeyAuthClient` instance and call `InitAsync` before using other features.
@@ -331,6 +336,11 @@ else
 ## Dependency Injection (DI) Integration
 
 This is the primary feature of this refactored library. You can easily integrate KeyAuth into ASP.NET Core, Worker Services, or modern Console Apps using `Microsoft.Extensions.DependencyInjection`.
+
+### Installation
+```bash
+dotnet add package KeyAuth-Api.HostingExtensions
+```
 
 ### Setup
 
