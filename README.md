@@ -3,7 +3,7 @@
 **DISCLAIMER:**
 This is an **unofficial**, refactored version of the KeyAuth API wrapper. It is not affiliated with, endorsed by, or supported by the official KeyAuth team. This library does not violate the original license and does not intend to replace the official library. It offers a modern, Dependency Injection (DI) friendly, and asynchronous approach to integrating KeyAuth.
 
-If you are looking for the official, supported library, please visit: [KeyAuth-CSHARP-Example](https://github.com/KeyAuth/KeyAuth-CSHARP-Example).
+If you are looking for the official, supported library, please visit: [KeyAuth GitHub Page](https://github.com/KeyAuth).
 
 ---
 
@@ -17,7 +17,7 @@ This library provides a modernized wrapper for the KeyAuth API, featuring:
 
 ### Tutorial Video (Official)
 
-If you are looking for the official, supported library, please visit: [KeyAuth-CSHARP-Example](https://github.com/KeyAuth/KeyAuth-CSHARP-Example).
+If you are looking for the official examples and reference for C#, please visit: [KeyAuth-CSHARP-Example](https://github.com/KeyAuth/KeyAuth-CSHARP-Example).
 For general KeyAuth concepts and setup, please refer to the official tutorial:
 https://www.youtube.com/watch?v=5x4YkTmFH-U
 
