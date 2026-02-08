@@ -68,12 +68,10 @@ using KeyAuth;
 
 // Configure the client options
 var options = new KeyAuthClientOptions
-{
-    AppName = "example",
-    OwnerId = "JjPMBVlIOd",
-    Secret: "db40d586f4b189e04e5c18c3c94b7e72221be3f6551995adc05236948d1762bc",
-    AppVersion = "1.0"
-};
+(
+    appName: "example",
+    ownerId: "JjPMBVlIOd"
+);
 
 // Create the client instance
 using var client = new KeyAuthClient(options);

@@ -256,4 +256,3 @@ public class KeyAuthClient : IKeyAuthClient, IDisposable
         _httpClient?.Dispose();
     }
 }
-
