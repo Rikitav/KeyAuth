@@ -5,22 +5,17 @@ namespace KeyAuth;
 /// <summary>
 /// Options for configuring KeyAuth client
 /// </summary>
-/// <remarks>
-/// Creates a new instance of KeyAuthClientOptions
-/// </remarks>
-/// <param name="appName">Application name</param>
-/// <param name="ownerId">Application OwnerID (must be 10 characters)</param>
-public class KeyAuthClientOptions(string appName, string ownerId)
+public class KeyAuthClientOptions
 {
     /// <summary>
     /// Application name
     /// </summary>
-    public string AppName { get; private set; } = appName ?? throw new ArgumentNullException(nameof(appName));
+    public string AppName { get; set; }
 
     /// <summary>
     /// Application OwnerID (must be 10 characters)
     /// </summary>
-    public string OwnerId { get; private set; } = ownerId ?? throw new ArgumentNullException(nameof(ownerId));
+    public string OwnerId { get; set; }
 
     /// <summary>
     /// Application version
@@ -56,5 +51,25 @@ public class KeyAuthClientOptions(string appName, string ownerId)
     /// Domain name for file check
     /// </summary>
     public string FileCheckDomain { get; set; } = "keyauth.win";
+
+    /// <summary>
+    /// Creates a new instance of KeyAuthClientOptions
+    /// </summary>
+    /// <param name="appName">Application name</param>
+    /// <param name="ownerId">Application OwnerID (must be 10 characters)</param>
+    public KeyAuthClientOptions(string appName, string ownerId) : base()
+    {
+        AppName = appName ?? throw new ArgumentNullException(nameof(appName));
+        OwnerId = ownerId ?? throw new ArgumentNullException(nameof(ownerId));
+    }
+
+    /// <summary>
+    /// Creates a new instance of KeyAuthClientOptions.
+    /// </summary>
+    public KeyAuthClientOptions() : base()
+    {
+        AppName = string.Empty;
+        OwnerId = string.Empty;
+    }
 }
 

@@ -38,6 +38,12 @@ public class KeyAuthClient : IKeyAuthClient, IDisposable
     {
         Options = options ?? throw new ArgumentNullException(nameof(options));
 
+        if (string.IsNullOrEmpty(Options.AppName))
+            throw new ArgumentNullException(nameof(Options.AppName));
+
+        if (string.IsNullOrEmpty(Options.OwnerId))
+            throw new ArgumentNullException(nameof(Options.OwnerId));
+
         HttpClientHandler handler = new HttpClientHandler();
         if (Options.Proxy != null)
             handler.Proxy = Options.Proxy;

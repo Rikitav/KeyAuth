@@ -4,23 +4,15 @@ using System.Threading.Tasks;
 
 namespace KeyAuth.HostingExtensions;
 
-public sealed class HostedKeyAuthService(IKeyAuthClient client) : IHostedService
+/// <summary>
+/// Initialization dedicated hosted service for <see cref="KeyAuthClient"/>
+/// </summary>
+/// <param name="client"></param>
+public sealed class HostedKeyAuthService(IKeyAuthClient client) : BackgroundService
 {
     /// <inheritdoc/>
-    public Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _ = InternalStartAsync(cancellationToken);
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc/>
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    private async Task InternalStartAsync(CancellationToken cancellationToken)
-    {
-        await client.InitAsync(null, cancellationToken);
+        await client.InitAsync(null, stoppingToken);
     }
 }

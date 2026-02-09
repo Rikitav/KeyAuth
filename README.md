@@ -67,11 +67,11 @@ You must create a `KeyAuthClient` instance and call `InitAsync` before using oth
 using KeyAuth;
 
 // Configure the client options
-var options = new KeyAuthClientOptions
-(
-    appName: "example",
-    ownerId: "JjPMBVlIOd"
-);
+var options = new KeyAuthClientOptions()
+{
+    AppName = "example",
+    OwnerId = "JjPMBVlIOd"
+};
 
 // Create the client instance
 using var client = new KeyAuthClient(options);

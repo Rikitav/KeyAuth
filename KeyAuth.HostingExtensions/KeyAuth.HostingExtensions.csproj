@@ -9,7 +9,30 @@
 	<Title>KeyAuth-Api.HostingExtensions</Title>
 	<PackageId>KeyAuth-Api.HostingExtensions</PackageId>
 	<RepositoryUrl>https://github.com/Rikitav/KeyAuth</RepositoryUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageIcon>icon.png</PackageIcon>
+	<PackageTags>Auth;KeyAuth;login;system;login;register;secure;users;authentication;system;authentication;API</PackageTags>
+	<Version>1.0.1</Version>
+	<PackageProjectUrl>keyauth.cc</PackageProjectUrl>
+	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	<PackageOutputPath>..\bin\Release</PackageOutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />

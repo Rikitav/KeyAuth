@@ -9,11 +9,11 @@ public class Program
         Console.WriteLine("=== KeyAuth Test Application ===\n");
 
         // Configuring client options
-        KeyAuthClientOptions options = new KeyAuthClientOptions
-        (
-            "example",      // Change to name of your application
-            "JjPMBVlIOd"    // Change to your OwnerID (should be 10 characters long)
-        );
+        KeyAuthClientOptions options = new KeyAuthClientOptions()
+        {
+            AppName = "example",      // Change to name of your application
+            OwnerId = "JjPMBVlIOd"    // Change to your OwnerID (should be 10 characters long)
+        };
 
         using KeyAuthClient client = new KeyAuthClient(options);
 
